@@ -5,25 +5,11 @@
   // Imports
   import { onMount } from 'svelte'
   import {
-    mdiSquareRoundedBadge,
-    mdiSquareRoundedBadgeOutline,
-    mdiImageEdit,
-    mdiImageEditOutline,
-    mdiFullscreen,
-    mdiFullscreenExit,
-    mdiBorderVertical,
-    mdiArrowSplitHorizontal,
-    mdiAccessPoint,
-    mdiAccessPointOff,
     mdiRecord,
     mdiStop,
     mdiPause,
     mdiPlayPause,
     mdiConnection,
-    mdiCameraOff,
-    mdiCamera,
-    mdiMotionPlayOutline,
-    mdiMotionPlay
   } from '@mdi/js'
   import Icon from 'mdi-svelte'
   import { compareVersions } from 'compare-versions'
@@ -31,10 +17,6 @@
   import './style.scss'
   import { obs, sendCommand } from './obs.js'
   import ProgramPreview from './ProgramPreview.svelte'
-  import SceneSwitcher from './SceneSwitcher.svelte'
-  import SourceSwitcher from './SourceSwitcher.svelte'
-  import ProfileSelect from './ProfileSelect.svelte'
-  import SceneCollectionSelect from './SceneCollectionSelect.svelte'
 
   onMount(async () => {
     if ('serviceWorker' in navigator) {
@@ -129,54 +111,6 @@
       : `${mins < 10 ? '0' : ''}${mins}:${secs < 10 ? '0' : ''}${secs}`
   }
 
-  function toggleFullScreen () {
-    if (isFullScreen) {
-      if (document.exitFullscreen) {
-        document.exitFullscreen()
-      } else if (document.webkitExitFullscreen) {
-        document.webkitExitFullscreen()
-      } else if (document.msExitFullscreen) {
-        document.msExitFullscreen()
-      }
-    } else {
-      if (document.documentElement.requestFullscreen) {
-        document.documentElement.requestFullscreen()
-      } else if (document.documentElement.webkitRequestFullscreen) {
-        document.documentElement.webkitRequestFullscreen()
-      } else if (document.documentElement.msRequestFullscreen) {
-        document.documentElement.msRequestFullscreen()
-      }
-    }
-  }
-
-  async function toggleStudioMode () {
-    await sendCommand('SetStudioModeEnabled', {
-      studioModeEnabled: !isStudioMode
-    })
-  }
-
-  async function toggleReplay () {
-    const data = await sendCommand('ToggleReplayBuffer')
-    console.debug('ToggleReplayBuffer', data.outputActive)
-    if (data.outputActive === undefined) {
-      replayError = 'Replay buffer is not enabled.'
-      setTimeout(function () {
-        replayError = ''
-      }, 5000)
-    } else isReplaying = data.outputActive
-  }
-
-  async function switchSceneView () {
-    isSceneOnTop = !isSceneOnTop
-  }
-
-  async function startStream () {
-    await sendCommand('StartStream')
-  }
-
-  async function stopStream () {
-    await sendCommand('StopStream')
-  }
 
   async function startRecording () {
     await sendCommand('StartRecord')
@@ -186,13 +120,6 @@
     await sendCommand('StopRecord')
   }
 
-  async function startVirtualCam () {
-    await sendCommand('StartVirtualCam')
-  }
-
-  async function stopVirtualCam () {
-    await sendCommand('StopVirtualCam')
-  }
 
   async function pauseRecording () {
     await sendCommand('PauseRecord')
@@ -333,31 +260,7 @@
         <div class="buttons">
           <!-- svelte-ignore a11y-missing-attribute -->
           {#if connected}
-            <button class="button is-info is-light" disabled>
-              {#if heartbeat && heartbeat.stats}
-                {Math.round(heartbeat.stats.activeFps)} fps, {Math.round(
-                  heartbeat.stats.cpuUsage
-                )}% CPU, {heartbeat.stats.renderSkippedFrames} skipped frames
-              {:else}Connected{/if}
-            </button>
-            {#if heartbeat && heartbeat.streaming && heartbeat.streaming.outputActive}
-              <button
-                class="button is-danger"
-                on:click={stopStream}
-                title="Stop Stream"
-              >
-                <span class="icon"><Icon path={mdiAccessPointOff} /></span>
-                <span>{formatTime(heartbeat.streaming.outputDuration)}</span>
-              </button>
-            {:else}
-              <button
-                class="button is-danger is-light"
-                on:click={startStream}
-                title="Start Stream"
-              >
-                <span class="icon"><Icon path={mdiAccessPoint} /></span>
-              </button>
-            {/if}
+            
             {#if heartbeat && heartbeat.recording && heartbeat.recording.outputActive}
               {#if heartbeat.recording.outputPaused}
                 <button
@@ -393,79 +296,8 @@
                 <span class="icon"><Icon path={mdiRecord} /></span>
               </button>
             {/if}
-            {#if isVirtualCamActive}
-              <button
-                class="button is-danger"
-                on:click={stopVirtualCam}
-                title="Stop Virtual Webcam"
-              >
-                <span class="icon"><Icon path={mdiCameraOff} /></span>
-              </button>
-            {:else}
-              <button
-                class="button is-danger is-light"
-                on:click={startVirtualCam}
-                title="Start Virtual Webcam"
-              >
-                <span class="icon"><Icon path={mdiCamera} /></span>
-              </button>
-            {/if}
-            <button
-              class:is-light={!isStudioMode}
-              class="button is-link"
-              on:click={toggleStudioMode}
-              title="Toggle Studio Mode"
-            >
-              <span class="icon"><Icon path={mdiBorderVertical} /></span>
-            </button>
-            <button
-              class:is-light={!isSceneOnTop}
-              class="button is-link"
-              on:click={switchSceneView}
-              title="Show Scene on Top"
-            >
-              <span class="icon"><Icon path={mdiArrowSplitHorizontal} /></span>
-            </button>
-            <button
-              class:is-light={!editable}
-              class="button is-link"
-              title="Edit Scenes"
-              on:click={() => (editable = !editable)}
-            >
-              <span class="icon">
-                <Icon path={editable ? mdiImageEditOutline : mdiImageEdit} />
-              </span>
-            </button>
-            <button
-              class:is-light={!isIconMode}
-              class="button is-link"
-              title="Show Scenes as Icons"
-              on:click={() => (isIconMode = !isIconMode)}
-            >
-              <span class="icon">
-                <Icon
-                  path={isIconMode
-                    ? mdiSquareRoundedBadgeOutline
-                    : mdiSquareRoundedBadge}
-                />
-              </span>
-            </button>
-            <button
-              class:is-light={!isReplaying}
-              class:is-danger={replayError}
-              class="button is-link"
-              title="Toggle Replay Buffer"
-              on:click={toggleReplay}
-            >
-              <span class="icon">
-                <Icon
-                  path={isReplaying ? mdiMotionPlayOutline : mdiMotionPlay}
-                />
-              </span>
-              {#if replayError}<span>{replayError}</span>{/if}
-            </button>
-            <ProfileSelect />
-            <SceneCollectionSelect />
+          
+            
             <button
               class="button is-danger is-light"
               on:click={disconnect}
@@ -478,17 +310,7 @@
               >{errorMessage || 'Disconnected'}</button
             >
           {/if}
-          <!-- svelte-ignore a11y-missing-attribute -->
-          <button
-            class:is-light={!isFullScreen}
-            class="button is-link"
-            on:click={toggleFullScreen}
-            title="Toggle Fullscreen"
-          >
-            <span class="icon">
-              <Icon path={isFullScreen ? mdiFullscreenExit : mdiFullscreen} />
-            </span>
-          </button>
+          
         </div>
       </div>
     </div>
@@ -501,23 +323,10 @@
       {#if isSceneOnTop}
         <ProgramPreview {imageFormat} />
       {/if}
-      <SceneSwitcher
-        bind:scenes
-        buttonStyle={isIconMode ? 'icon' : 'text'}
-        {editable}
-      />
       {#if !isSceneOnTop}
         <ProgramPreview {imageFormat} />
       {/if}
-      {#each scenes as scene}
-        {#if scene.sceneName.indexOf('(switch)') > 0}
-          <SourceSwitcher
-            name={scene.sceneName}
-            {imageFormat}
-            buttonStyle="screenshot"
-          />
-        {/if}
-      {/each}
+      
     {:else}
       <h1 class="subtitle">
         Welcome to
