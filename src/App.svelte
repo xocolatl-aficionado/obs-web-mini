@@ -257,65 +257,74 @@
   <div id="navmenu" class="navbar-menu">
     <div class="navbar-end">
       <div class="navbar-item">
-        <div class="buttons">
-          <!-- svelte-ignore a11y-missing-attribute -->
-          {#if connected}
-            
-            {#if heartbeat && heartbeat.recording && heartbeat.recording.outputActive}
-              {#if heartbeat.recording.outputPaused}
-                <button
-                  class="button is-danger"
-                  on:click={resumeRecording}
-                  title="Resume Recording"
-                >
-                  <span class="icon"><Icon path={mdiPlayPause} /></span>
-                </button>
-              {:else}
-                <button
-                  class="button is-success"
-                  on:click={pauseRecording}
-                  title="Pause Recording"
-                >
-                  <span class="icon"><Icon path={mdiPause} /></span>
-                </button>
-              {/if}
-              <button
-                class="button is-danger"
-                on:click={stopRecording}
-                title="Stop Recording"
-              >
-                <span class="icon"><Icon path={mdiStop} /></span>
-                <span>{formatTime(heartbeat.recording.outputDuration)}</span>
-              </button>
-            {:else}
-              <button
-                class="button is-danger is-light"
-                on:click={startRecording}
-                title="Start Recording"
-              >
-                <span class="icon"><Icon path={mdiRecord} /></span>
-              </button>
-            {/if}
-          
-            
-            <button
-              class="button is-danger is-light"
-              on:click={disconnect}
-              title="Disconnect"
-            >
-              <span class="icon"><Icon path={mdiConnection} /></span>
-            </button>
-          {:else}
-            <button class="button is-danger" disabled
-              >{errorMessage || 'Disconnected'}</button
-            >
-          {/if}
-          
-        </div>
+      
       </div>
     </div>
   </div>
 </nav>
+
+<section class="controls-section mt-5">
+  <div class="container">
+    <div class="buttons is-centered">
+      <!-- svelte-ignore a11y-missing-attribute -->
+      {#if connected}
+        {#if heartbeat && heartbeat.recording && heartbeat.recording.outputActive}
+          {#if heartbeat.recording.outputPaused}
+            <button
+              class="button is-large is-danger"
+              on:click={resumeRecording}
+              title="Resume Recording"
+            >
+              <span class="icon"><Icon path={mdiPlayPause} /></span>
+              <span class="ml-2">Resume</span>
+            </button>
+          {:else}
+            <button
+              class="button is-large is-success"
+              on:click={pauseRecording}
+              title="Pause Recording"
+            >
+              <span class="icon"><Icon path={mdiPause} /></span>
+              <span class="ml-2">Pause</span>
+            </button>
+          {/if}
+          <button
+            class="button is-large is-danger"
+            on:click={stopRecording}
+            title="Stop Recording"
+          >
+            <span class="icon"><Icon path={mdiStop} /></span>
+            <span class="ml-2">Stop</span>
+            <span class="ml-2">{formatTime(heartbeat.recording.outputDuration)}</span>
+          </button>
+        {:else}
+          <button
+            class="button is-large is-danger is-light"
+            on:click={startRecording}
+            title="Start Recording"
+          >
+            <span class="icon"><Icon path={mdiRecord} /></span>
+            <span class="ml-2">Start</span>
+          </button>
+        {/if}
+
+        <button
+          class="button is-large is-danger is-light"
+          on:click={disconnect}
+          title="Disconnect"
+        >
+          <span class="icon"><Icon path={mdiConnection} /></span>
+          <span class="ml-2">Disconnect</span>
+        </button>
+      {:else}
+        <button class="button is-large is-danger" disabled>
+          {errorMessage || 'Disconnected'}
+        </button>
+      {/if}
+    </div>
+  </div>
+</section>
+
 
 <section class="section">
   <div class="container">
@@ -329,13 +338,10 @@
       
     {:else}
       <h1 class="subtitle">
-        Welcome to
-        <strong>OBS-web</strong>
-        - the easiest way to control
-        <a href="https://obsproject.com/" target="_blank" rel="noreferrer"
-          >OBS</a
-        >
-        remotely!
+        Remotely record via
+        <strong>OBS Studio</strong>
+        on your laptop. 
+        
       </h1>
 
       {#if document.location.protocol === 'https:'}
@@ -361,33 +367,45 @@
         </div>
       {/if}
 
-      <p>To get started, enter your OBS host:port below and click "connect".</p>
+      <p class="subtitle is-5 has-text-centered">
+        Let's get started! 🎉<br>
+        Enter your OBS host:port below and click "Connect".
+      </p>
 
       <form on:submit|preventDefault={connect}>
-        <div class="field is-grouped">
-          <p class="control is-expanded">
+        <div class="field">
+          <label for="host" class="label">OBS Host:Port</label>
+          <div class="control">
             <input
               id="host"
               bind:value={address}
-              class="input"
+              class="input is-rounded"
               type="text"
               autocomplete=""
               placeholder="ws://localhost:4455"
             />
+          </div>
+        </div>
+        <div class="field">
+          <label for="password" class="label">Password</label>
+          <div class="control">
             <input
               id="password"
               bind:value={password}
-              class="input"
+              class="input is-rounded"
               type="password"
               autocomplete="current-password"
-              placeholder="password (leave empty if you have disabled authentication)"
+              placeholder="Password (leave empty if disabled)"
             />
-          </p>
-          <p class="control">
-            <button class="button is-success">Connect</button>
-          </p>
+          </div>
+        </div>
+        <div class="field has-text-centered">
+          <button class="button is-success is-rounded is-medium">
+            Connect 🚀
+          </button>
         </div>
       </form>
+
       <p class="help">
         Make sure that you use <a
           href="https://github.com/obsproject/obs-studio/releases">OBS v28+</a
