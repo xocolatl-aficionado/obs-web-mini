@@ -94,7 +94,7 @@
       : `${mins < 10 ? '0' : ''}${mins}:${secs < 10 ? '0' : ''}${secs}`
   }
 
-
+  
   async function startRecording () {
     await sendCommand('StartRecord')
   }
@@ -112,27 +112,47 @@
     await sendCommand('ResumeRecord')
   }
 
-  async function connect () {
-    address = address || 'ws://localhost:4455'
+  async function connect() {
+    address = address || 'ws://localhost:4455';
     if (address.indexOf('://') === -1) {
-      const secure = location.protocol === 'https:' || address.endsWith(':443')
-      address = secure ? 'wss://' : 'ws://' + address
+        const secure = location.protocol === 'https:' || address.endsWith(':443');
+        address = secure ? 'wss://' + address : 'ws://' + address;
     }
-    console.log('Connecting to:', address, '- using password:', password)
-    await disconnect()
+    console.log('Connecting to:', address, '- using password:', password);
+    await disconnect();  // Ensure this is properly defined elsewhere
+    
     try {
-      const { obsWebSocketVersion, negotiatedRpcVersion } = await obs.connect(
-        address,
-        password
-      )
-      console.log(
-        `Connected to obs-websocket version ${obsWebSocketVersion} (using RPC ${negotiatedRpcVersion})`
-      )
+        const { obsWebSocketVersion, negotiatedRpcVersion } = await obs.connect(address, password);
+        console.log(
+            `Connected to obs-websocket version ${obsWebSocketVersion} (using RPC ${negotiatedRpcVersion})`
+        );
     } catch (e) {
-      console.log(e)
-      errorMessage = e.message
+        console.log('Connection failed:', e.message);
+        errorMessage = e.message;
+
     }
+}
+
+async function startOBS() {
+  try {
+    // Make a POST request to your backend endpoint to start OBS Studio
+    const response = await fetch('http://localhost:3001/start-obs', { method: 'GET' });
+    const data = await response.json();
+
+    if (data.success) {
+      console.log('OBS Studio started successfully.');
+      // Optionally, attempt to connect to OBS after a delay
+      setTimeout(connect, 5000); // Adjust delay as needed
+    } else {
+      console.error('Failed to start OBS Studio:', data.error);
+    }
+  } catch (error) {
+    console.error('Error starting OBS Studio:', error.message);
   }
+}
+
+
+
 
   async function disconnect () {
     await obs.disconnect()
@@ -294,7 +314,9 @@
 
 <section class="section">
   <div class="container">
+    
     {#if connected}
+
       {#if isSceneOnTop}
         <ProgramPreview {imageFormat} />
       {/if}
@@ -303,6 +325,15 @@
       {/if}
       
     {:else}
+    <div class="field has-text-centered">
+      <button
+      class="button is-success is-rounded is-medium"
+      on:click={startOBS}
+      title="Start OBS Studio"
+    >
+      Start OBS
+    </button></div>
+        
       <h1 class="subtitle">
         Remotely record via
         <strong>OBS Studio</strong>
