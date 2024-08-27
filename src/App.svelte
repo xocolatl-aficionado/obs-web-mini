@@ -69,8 +69,8 @@
   let isSceneOnTop = window.localStorage.getItem('isSceneOnTop') || false
   let isIconMode = window.localStorage.getItem('isIconMode') || false
 
-  let address
-  let password
+  let address = "ws://localhost:4455"
+  let password = "esJOZG4FH8xrgekc"
 
   let errorMessage = ''
   let imageFormat = 'jpg'
@@ -142,7 +142,7 @@ async function startOBS() {
     if (data.success) {
       console.log('OBS Studio started successfully.');
       // Optionally, attempt to connect to OBS after a delay
-      setTimeout(connect, 5000); // Adjust delay as needed
+      await connect(); // Adjust delay as needed
     } else {
       console.error('Failed to start OBS Studio:', data.error);
     }
@@ -303,9 +303,7 @@ async function startOBS() {
           <span class="ml-2">Disconnect</span>
         </button>
       {:else}
-        <button class="button is-large is-danger" disabled>
-          {errorMessage || 'Disconnected'}
-        </button>
+        
       {/if}
     </div>
   </div>
@@ -328,16 +326,17 @@ async function startOBS() {
     <div class="field has-text-centered">
       <button
       class="button is-success is-rounded is-medium"
-      on:click={startOBS}
+      on:click={() => { startOBS(); connect(); }}
       title="Start OBS Studio"
     >
       Start OBS
     </button></div>
         
-      <h1 class="subtitle">
-        Remotely record via
+      <h1 class="subtitle welcome-message">
+        Capture every moment like a pro—remotely, effortlessly, and in style.
+        Control your
         <strong>OBS Studio</strong>
-        on your laptop. 
+        remotely. 
         
       </h1>
 
@@ -363,60 +362,6 @@ async function startOBS() {
           .
         </div>
       {/if}
-
-      <p class="subtitle is-5 has-text-centered">
-        Let's get started! 🎉<br>
-        Enter your OBS host:port below and click "Connect".
-      </p>
-
-      <form on:submit|preventDefault={connect}>
-        <div class="field">
-          <label for="host" class="label">OBS Host:Port</label>
-          <div class="control">
-            <input
-              id="host"
-              bind:value={address}
-              class="input is-rounded"
-              type="text"
-              autocomplete=""
-              placeholder="ws://localhost:4455"
-            />
-          </div>
-        </div>
-        <div class="field">
-          <label for="password" class="label">Password</label>
-          <div class="control">
-            <input
-              id="password"
-              bind:value={password}
-              class="input is-rounded"
-              type="password"
-              autocomplete="current-password"
-              placeholder="Password (leave empty if disabled)"
-            />
-          </div>
-        </div>
-        <div class="field has-text-centered">
-          <button class="button is-success is-rounded is-medium">
-            Connect 🚀
-          </button>
-        </div>
-      </form>
-
-      <p class="help">
-        Make sure that you use <a
-          href="https://github.com/obsproject/obs-studio/releases">OBS v28+</a
-        >
-        or install the
-        <a
-          href="https://github.com/obsproject/obs-websocket/releases/tag/{OBS_WEBSOCKET_LATEST_VERSION}"
-          target="_blank"
-          rel="noreferrer"
-          >obs-websocket {OBS_WEBSOCKET_LATEST_VERSION} plugin</a
-        >
-        for v27. If you use an older version of OBS, see the
-        <a href="/v4/">archived OBS-web v4</a> page.
-      </p>
     {/if}
   </div>
 </section>
@@ -424,11 +369,11 @@ async function startOBS() {
 <footer class="footer">
   <div class="content has-text-centered">
     <p>
-      <strong>OBS-web</strong>
+      <strong>OBS-web-mini</strong>
       by
-      <a href="https://niekvandermaas.nl/">Niek van der Maas</a>
+      <a href="http://www.adithyasudhan.netlify.app/">Adi</a>
       &mdash; see
-      <a href="https://github.com/Niek/obs-web">GitHub</a>
+      <a href="https://github.com/xocolatl-aficionado/obs-web-mini/">GitHub</a>
       for source code.
     </p>
   </div>
