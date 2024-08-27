@@ -45,19 +45,6 @@
         .classList.toggle('is-active')
     })
 
-    // Listen for fullscreen changes
-    document.addEventListener('fullscreenchange', () => {
-      isFullScreen = document.fullscreenElement
-    })
-
-    document.addEventListener('webkitfullscreenchange', () => {
-      isFullScreen = document.webkitFullscreenElement
-    })
-
-    document.addEventListener('msfullscreenchange', () => {
-      isFullScreen = document.msFullscreenElement
-    })
-
     if (document.location.hash !== '') {
       // Read address from hash
       address = document.location.hash.slice(1)
@@ -78,17 +65,13 @@
   let connected
   let heartbeat = {}
   let heartbeatInterval
-  let isFullScreen
-  let isStudioMode
+
   let isSceneOnTop = window.localStorage.getItem('isSceneOnTop') || false
-  let isVirtualCamActive
   let isIconMode = window.localStorage.getItem('isIconMode') || false
-  let isReplaying
-  let editable = false
+
   let address
   let password
-  let scenes = []
-  let replayError = ''
+
   let errorMessage = ''
   let imageFormat = 'jpg'
 
@@ -199,10 +182,7 @@
       heartbeat = { stats, streaming, recording }
       // console.log(heartbeat);
     }, 1000) // Heartbeat
-    isStudioMode =
-      (await sendCommand('GetStudioModeEnabled')).studioModeEnabled || false
-    isVirtualCamActive =
-      (await sendCommand('GetVirtualCamStatus')).outputActive || false
+
   })
 
   obs.on('ConnectionError', async () => {
@@ -215,20 +195,6 @@
     }
   })
 
-  obs.on('VirtualcamStateChanged', async (data) => {
-    console.log('VirtualcamStateChanged', data.outputActive)
-    isVirtualCamActive = data && data.outputActive
-  })
-
-  obs.on('StudioModeStateChanged', async (data) => {
-    console.log('StudioModeStateChanged', data.studioModeEnabled)
-    isStudioMode = data && data.studioModeEnabled
-  })
-
-  obs.on('ReplayBufferStateChanged', async (data) => {
-    console.log('ReplayBufferStateChanged', data)
-    isReplaying = data && data.outputActive
-  })
 </script>
 
 <svelte:head>
