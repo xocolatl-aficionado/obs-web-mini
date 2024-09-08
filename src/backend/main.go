@@ -7,13 +7,13 @@ import (
 	"os/exec"
 	"time"
 
-	"github.com/shirou/gopsutil/v3/process"
 	"github.com/rs/cors"
+	"github.com/shirou/gopsutil/v3/process"
 )
 
 const obsPath = "/usr/bin/obs" // Adjust the path to match your system's OBS executable path
 
-// Check if OBS is running
+// Check if OBS is running by its process name and status
 func checkOBS() (bool, error) {
 	fmt.Println("Checking if OBS is running...")
 	processes, err := process.Processes()
@@ -24,8 +24,17 @@ func checkOBS() (bool, error) {
 	for _, p := range processes {
 		name, err := p.Name()
 		if err == nil && name == "obs" { // Adjust "obs" if needed
-			fmt.Println("OBS is running.")
-			return true, nil
+			// Get process status to ensure it's not a zombie or terminated process
+			statuses, err := p.Status()
+			if err == nil {
+				// Check if the status contains "R" (running) or "S" (sleeping)
+				for _, status := range statuses {
+					if status == "R" || status == "S" {
+						fmt.Println("OBS is running.")
+						return true, nil
+					}
+				}
+			}
 		}
 	}
 	fmt.Println("OBS is not running.")
