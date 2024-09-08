@@ -69,8 +69,8 @@
   let isSceneOnTop = window.localStorage.getItem('isSceneOnTop') || false
   let isIconMode = window.localStorage.getItem('isIconMode') || false
 
-  let address = "ws://localhost:4455"
-  let password = "esJOZG4FH8xrgekc"
+  let address = "ws://0.0.0.0:4455"
+  let password = "xxxxxxxxxxxxxxxx"
 
   let errorMessage = ''
   let imageFormat = 'jpg'
@@ -113,7 +113,7 @@
   }
 
   async function connect() {
-    address = address || 'ws://localhost:4455';
+    address = address || 'ws://0.0.0.0:4455';
     if (address.indexOf('://') === -1) {
         const secure = location.protocol === 'https:' || address.endsWith(':443');
         address = secure ? 'wss://' + address : 'ws://' + address;
@@ -136,7 +136,7 @@
 async function startOBS() {
   try {
     // Make a POST request to your backend endpoint to start OBS Studio
-    const response = await fetch('http://localhost:3001/start-obs', { method: 'GET' });
+    const response = await fetch('http://0.0.0.0:3001/start-obs', { method: 'GET' });
     const data = await response.json();
 
     if (data.success) {
@@ -326,7 +326,7 @@ async function startOBS() {
     <div class="field has-text-centered">
       <button
       class="button is-success is-rounded is-medium"
-      on:click={() => { startOBS(); connect(); }}
+      on:click={() => {   console.log('Start OBS clicked'); startOBS(); connect(); }}
       title="Start OBS Studio"
     >
       Start OBS
