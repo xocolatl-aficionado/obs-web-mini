@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"os/exec"
+	"strings"
 	"time"
 
 	"github.com/rs/cors"
@@ -29,7 +30,8 @@ func checkOBS() (bool, error) {
 			if err == nil {
 				// Check if the status contains "R" (running) or "S" (sleeping)
 				for _, status := range statuses {
-					if status == "R" || status == "S" {
+					fmt.Println(status)
+					if strings.Contains(status, "s") {
 						fmt.Println("OBS is running.")
 						return true, nil
 					}
