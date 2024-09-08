@@ -8,7 +8,7 @@
     "start": "sirv public --host --port 5000",
     "lint": "npx standard --fix && npx standard --parser svelte-eslint-parser --plugin svelte '**/*.svelte' --fix",
     "start:backend": "node src/backend/obs-controller.js",
-    "start:all": "concurrently \"npm run dev\" \"npm run start:backend\""
+    "start:all": "concurrently \"npm run dev\" \"cd src/backend && go run main.go\""
   },
   "devDependencies": {
     "@fullhuman/postcss-purgecss": "^5.0.0",
